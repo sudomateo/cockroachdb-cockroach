@@ -29,7 +29,9 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/settings"
 	"github.com/cockroachdb/cockroach/pkg/settings/cluster"
 	"github.com/cockroachdb/cockroach/pkg/util/log"
+	"github.com/cockroachdb/cockroach/pkg/util/log/eventpb"
 	"github.com/cockroachdb/cockroach/pkg/util/log/logcrash"
+	"github.com/cockroachdb/cockroach/pkg/util/log/logpb"
 	"github.com/cockroachdb/cockroach/pkg/util/metric"
 	"github.com/cockroachdb/cockroach/pkg/util/randutil"
 	"github.com/cockroachdb/cockroach/pkg/util/stop"
@@ -419,6 +421,19 @@ func (p *Prober) readProbeImpl(ctx context.Context, ops proberOpsI, txns proberT
 	}
 
 	d := timeutil.Since(start)
+	log.StructuredEvent(ctx, &eventpb.KVProber{
+		CommonEventDetails: logpb.CommonEventDetails{
+			Timestamp: timeutil.Now().UnixNano(),
+			EventType: "KVProber",
+		},
+		Type:      "Get",
+		Key:       step.Key,
+		RangeID:   int64(step.RangeID),
+		HasError:  false,
+		ErrorText: "",
+		Latency:   uint64(d.Milliseconds()),
+		// Leaseholder: FOO,
+	})
 	log.Health.Infof(ctx, "kv.Get(%s), r=%v returned success in %v", step.Key, step.RangeID, d)
 
 	// Latency of failures is not recorded. They are counted as failures tho.

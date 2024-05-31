@@ -1,0 +1,44 @@
+// Copyright 2024 The Cockroach Authors.
+//
+// Use of this software is governed by the Business Source License
+// included in the file licenses/BSL.txt.
+//
+// As of the Change Date specified in that file, in accordance with
+// the Business Source License, use of this software will be governed
+// by the Apache License, Version 2.0, included in the file
+// licenses/APL.txt.
+
+syntax = "proto3";
+package cockroach.util.log.eventpb;
+option go_package = "github.com/cockroachdb/cockroach/pkg/util/log/eventpb";
+
+import "gogoproto/gogo.proto";
+import "util/log/logpb/event.proto";
+
+// Category: KVProber Events
+// Channel: HEALTH
+//
+// Events in this category pertain to the health KV blah.
+
+// Notes to CockroachDB maintainers: refer to doc.go at the package
+// level for more details. Beware that JSON compatibility rules apply
+// here, not protobuf.
+// *Really look at doc.go before modifying this file.*
+
+// RuntimeStats is recorded every 10 seconds as server health metrics.
+message KVProber {
+  CommonEventDetails common = 1 [(gogoproto.nullable) = false, (gogoproto.jsontag) = "", (gogoproto.embed) = true];
+
+  string type = 2 [(gogoproto.customname) = "Type", (gogoproto.jsontag) = ",omitempty", (gogoproto.moretags) =  "redact:\"nonsensitive\""];
+
+  string key = 3 [(gogoproto.customname) = "Key", (gogoproto.jsontag) = ",omitempty", (gogoproto.moretags) =  "redact:\"nonsensitive\""];
+
+  int64 range_id = 4 [(gogoproto.customname) = "RangeID", (gogoproto.jsontag) = ",omitempty"];
+
+  bool has_error = 5 [(gogoproto.customname) = "HasError", (gogoproto.jsontag) = ",omitempty"];
+
+  string error_text = 6 [(gogoproto.customname) = "ErrorText", (gogoproto.jsontag) = ",omitempty"];
+
+  // Make this duration.
+  uint64 latency = 7 [(gogoproto.customname) = "Latency", (gogoproto.jsontag) = ",omitempty"];
+}
